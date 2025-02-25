@@ -1,7 +1,7 @@
 from PIL import Image;
 import pathlib
 
-data_dir = pathlib.Path("C:/Users/Druumihra/projects/Colouring_AI/")
+data_dir = pathlib.Path("./")
 
 def check_images(image_name):
     og_count = len(list(data_dir.glob('images/original/*')))
