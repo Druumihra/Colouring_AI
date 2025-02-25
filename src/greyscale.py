@@ -14,6 +14,10 @@ def check_images(image_name):
 
 def grey_scale_images():
     for image in data_dir.glob('Images/original/*') :
+        test = image.name.split(".")
+        length = len(test)
+        if test[length-1] == "avif" :
+            return
         if check_images(image.name):
             im = Image.open(image)
             im = im.convert("L")
