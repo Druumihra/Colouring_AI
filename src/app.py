@@ -11,11 +11,10 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 import pathlib
 
-data_dir = pathlib.Path("./Images/original/")
-image_count = len(list(data_dir.glob("*")))
-print(image_count)
+data_dir = pathlib.Path("./Images")
 
-images = list(data_dir.glob('*'))
+
+images = list(data_dir.glob('original/*'))
 
 # Defining parameters for our loader
 batch_size = 32
@@ -67,8 +66,9 @@ def build_model():
 model = build_model()
 model.compile(optimizer='adam', loss="mean_squared_error", metrics=['accuracy'])
 
+epoch_amount = 5
 # Train the model
-history = model.fit(l_channels, ab_channels, epochs=30, batch_size=batch_size, validation_split=0.1, verbose=1)
+history = model.fit(l_channels, ab_channels, epochs= epoch_amount, batch_size=batch_size, validation_split=0.02, verbose=1)
 
 # Save the model
 model.save('colorization_model.keras')
@@ -80,7 +80,7 @@ val_acc = history.history['val_accuracy']
 loss = history.history['loss']
 val_loss = history.history['val_loss']
 
-epochs_range = range(30)
+epochs_range = range(epoch_amount)
 
 # Plotting the training and validation accuracy
 plt.figure(figsize=(8, 8))
@@ -104,10 +104,9 @@ def colorize_image(model, image_path):
 
     # Predict the AB channels
     ab_channels = model.predict(l_channel)[0]  # Remove batch dimension
-
     # Denormalize the channels
     l_channel = l_channel[0, ..., 0] * 255.0  # Remove batch and channel dimensions
-    ab_channels = (ab_channels * 128.0) + 128.0
+    ab_channels = (ab_channels * 128.0) + 128
 
     # Combine the L and AB channels
     lab_image = np.zeros((img_height, img_width, 3))
@@ -122,17 +121,23 @@ def colorize_image(model, image_path):
     print("AB channels shape:", ab_channels.shape)
     print("LAB image shape:", lab_image.shape)
     print("RGB image shape:", rgb_image.shape)
-    
+    rgb_image = cv2.resize(rgb_image,(1920,1080))
     return rgb_image
 
 # Load the trained model
 model = keras.models.load_model('colorization_model.keras')
 
 # Colorize a greyscaled image
-image_path = './Images/greyscaled/greyscale_test.png'
-colorized_image = colorize_image(model, image_path)
 
-# Display the colorized image
-plt.imshow(colorized_image)
-plt.axis('off')
-plt.show()
+grey_images = list(data_dir.glob('greyscaled/*'))
+
+for image in data_dir.glob('greyscaled/*'):
+    colorized_image = colorize_image(model, image)
+    
+    # Display the colorized image
+    plt.imshow(colorized_image)
+    plt.axis('off')
+    plt.show()
+
+
+
