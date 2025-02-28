@@ -32,7 +32,6 @@ def load_and_preprocess_image(path):
     image = np.array(image)
     lab_image = cv2.cvtColor(image, cv2.COLOR_RGB2LAB)
     l_channel = lab_image[:, :, 0] / 255.0
-    print(f"lab stuff: {lab_image[:, :, 1:]}")
     ab_channels = (lab_image[:, :, 1:] / 1000.0)
     return l_channel, ab_channels
 
@@ -111,23 +110,13 @@ def colorize_image(model, image_path):
     # Denormalize the channels
     l_channel = l_channel[0, ..., 0] *255 # Remove batch and channel dimensions
     ab_channels = ab_channels * 1000
-    print(f"AB Channel:{ab_channels}")
     # Combine the L and AB channels
     colorized = np.concatenate((l_channel[:,:,np.newaxis],ab_channels), axis=2)
 
 
-    colorized = cv2.cvtColor(colorized.astype(np.uint8), cv2.COLOR_LAB2RGB)
-    # lab_image = np.zeros((img_height, img_width, 3))
-    # lab_image[..., 0] = l_channel
-    # lab_image[..., 1:] = ab_channels
-
     # Convert LAB image to RGB
-    
-    # Debug prints
-    print("L channel shape:", l_channel.shape)
-    print("AB channels shape:", ab_channels.shape)
-    # print("LAB image shape:", lab_image.shape)
-    print("RGB image shape:", colorized.shape)
+    colorized = cv2.cvtColor(colorized.astype(np.uint8), cv2.COLOR_LAB2RGB)
+
     colorized = cv2.resize(colorized,(1920,1080))
     return colorized
 
