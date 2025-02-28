@@ -17,7 +17,10 @@ data_dir = pathlib.Path("./Images")
 images = list(data_dir.glob('original/*'))
 
 # Defining parameters for our loader
-batch_size = 32
+batch_size = 16
+val_split = 0.1
+epoch_amount = 10
+
 img_height = 180
 img_width = 180
 
@@ -66,9 +69,8 @@ def build_model():
 model = build_model()
 model.compile(optimizer='adam', loss="mean_squared_error", metrics=['accuracy'])
 
-epoch_amount = 5
 # Train the model
-history = model.fit(l_channels, ab_channels, epochs= epoch_amount, batch_size=batch_size, validation_split=0.02, verbose=1)
+history = model.fit(l_channels, ab_channels,epochs=epoch_amount, batch_size=batch_size, validation_split=val_split, verbose=1)
 
 # Save the model
 model.save('colorization_model.keras')
@@ -138,6 +140,7 @@ for image in data_dir.glob('greyscaled/*'):
     plt.imshow(colorized_image)
     plt.axis('off')
     plt.show()
+
 
 
 
